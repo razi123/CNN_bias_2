@@ -1,0 +1,8 @@
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2018.3/bin/unwrapped/win64.o/xelab.exe -wto 7bfdcf18a3104eecb5a2cc631e2159a9 --debug typical --relax --mt 2 -L xil_defaultlib -L secureip --snapshot mult_tb_func_synth xil_defaultlib.mult_tb -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+ERROR: [VRFC 10-718] formal port <inpMat> does not exist in entity <matMult>.  Please compare the definition of block <matMult> to its component declaration and its instantion to detect the mismatch. [C:/Users/khazi/projects/MasterThesis/test_pro/test_pro.srcs/sim_1/new/mult_tb.vhd:54]
+ERROR: [VRFC 10-718] formal port <outMat> does not exist in entity <matMult>.  Please compare the definition of block <matMult> to its component declaration and its instantion to detect the mismatch. [C:/Users/khazi/projects/MasterThesis/test_pro/test_pro.srcs/sim_1/new/mult_tb.vhd:55]
+ERROR: [XSIM 43-3321] Static elaboration of top level VHDL design unit mult_tb in library work failed.
