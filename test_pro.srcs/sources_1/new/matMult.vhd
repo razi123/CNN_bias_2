@@ -64,7 +64,7 @@ signal cntCol : integer range 0 to (((matRow-kernRow)/kernStride)+1)-1 ;
 
 signal s_tempMult: t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1) := (("00000000","00000000","00000000"),("00000000","00000000","00000000"),("00000000","00000000","00000000")); 
 signal s_outDataMultiply, s_ReLU_Out, s_FIFO_Out, s_outDataFIFO: t_2d_out(0 to (matRow*matCol)-1);
-signal s_colDone, s_doneBit, s_poolDone, s_doneOutBit, s_enbConv2: STD_LOGIC := '0';
+signal s_colDone, s_doneBit, s_poolDone, s_doneOutBit, s_enbConv2, s_poolCntDone, s_poolEnb: STD_LOGIC := '0';
 signal s_poolData : t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
 signal s_outMatrix : t_2d_matrix(0 to matRow-1, 0 to matCol-1);
 
@@ -113,25 +113,31 @@ component outMatrix
       rst: in STD_LOGIC := '0'; 
       readEnb: in STD_LOGIC;
       readData: in t_2d_out(0 to (matRow*matCol)-1); 
+      poolEnb : out STD_LOGIC := '0';
       matReady: out STD_LOGIC; 
       mat2Conv2: out t_2d_matrix(0 to matRow-1, 0 to matCol-1));
 end component;
 
-component regFIFO
-    port(   clk : in STD_LOGIC;
-              rst : in STD_LOGIC := '0';
-              w_en : in STD_LOGIC := '0';
-              wData : in t_2d_out(0 to (matRow*matCol)-1);
-              rData : out t_2d_out(0 to (matRow*matCol)-1));
-        end component;
+
 
 component maxPool is
      port(clk: in STD_LOGIC;
          rst : in STD_LOGIC := '0';
-         poolRead : in t_2d_out(0 to (matRow*matCol)-1);
+         poolRead : in t_2d_matrix(0 to matRow-1, 0 to matCol-1);
+         poolEnb : in STD_LOGIC := '0';
          poolOut : out t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
          donePool : out STD_LOGIC := '0');
 end component;
+
+--component poolCount is
+-- port(clk: in STD_LOGIC;
+--      cntEnb : in STD_LOGIC :='0';
+--      rst : in STD_LOGIC := '0';
+--      poolRow : out integer range 0 to (((matRow-kernRow)/kernStride)+1)-1   := 0;
+--      poolCol : out integer range 0 to (((matCol-kernCol)/kernStride)+1)-1   := 0;
+--      poolDone : out STD_LOGIC := '0');
+      
+--  end component;
 
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -182,23 +188,28 @@ OUT_MATRIX : outMatrix
  port map(clk => clk, 
          rst => rst, 
          readEnb => s_doneOutBit,
+         poolEnb => s_poolEnb,
          readData => s_outDataMultiply, 
          matReady => s_enbConv2, 
          mat2Conv2 => s_outMatrix);
          
---REG_FIFO : regFIFO
---    port map (clk => clk,  
---              rst => rst,
---              --w_en => s_doneBit,
---              wData => s_outDataMultiply,
---              rData => s_FIFO_Out);
+
  
---MAX_POOLING: maxPool
---     port map(clk => clk,  
---              rst => rst,
---              poolRead => s_outDataMultiply,
---              poolOut => s_poolData,
---              donePool => s_poolDone);  
+MAX_POOLING: maxPool
+     port map(clk => clk,  
+              rst => rst,
+              poolEnb => s_poolEnb,
+              poolRead => s_outMatrix,
+              poolOut => s_poolData,
+              donePool => s_poolDone);  
+
+
+--poolCount : port map (clk => clk,
+--      cntEnb => cntEnb, 
+--      rst => rst, 
+--      poolRow => poolRow, 
+--      poolCol => poolCol, 
+--      poolDone => s_poolCntDone);
 
 --doneBit <= s_doneBit;         
 --outMat <= s_FIFO_Out;
@@ -209,12 +220,4 @@ OUT_MATRIX : outMatrix
      
 doneBit <= s_enbConv2;     
 
-end Behavioral;              
-              
-
-
-
-
-
-
-
+end Behavioral;

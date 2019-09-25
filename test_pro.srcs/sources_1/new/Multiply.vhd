@@ -1,4 +1,3 @@
-
 -- *************************************************Multiply COUNT ********************************************************
 
 ----------------------------------------------------------------------------------
@@ -58,8 +57,8 @@ architecture Behavioral of Multiply is
 
 
 signal s_temp: t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1) ; 
---signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("0001","0000","0000"),("0000","0001","0000"),("0000","0000","0001"));
-signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("1111","1111","1111"),("1111","1111","1111"),("1111","1111","1111"));
+signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("0001","0000","0000"),("0000","0001","0000"),("0000","0000","0001"));
+--signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("1111","1111","1111"),("1111","1111","1111"),("1111","1111","1111"));
 signal s_doneMultiply : STD_LOGIC :='0';
 signal s_z : integer ;
 signal s_tempOut : t_2d_out(0 to (matRow*matCol)-1);
@@ -152,8 +151,10 @@ if rising_edge(clk) then
         n <= 0;
     else
         if(s_readEnb_d = '1') then
-            s_tempOut(s_z) <= ("000" & s_temp(0,0)) +("000" & s_temp(0,1)) + ("000" & s_temp(0,2)) + ("000" & s_temp(1,0)) +("000" & s_temp(1,1)) + ("000" & s_temp(1,2))+ 
-            ("000" & s_temp(2,0))+("000" & s_temp(2,1)) +("000" & s_temp(2,2));
+          --  s_tempOut(s_z) <= ("000" & s_temp(0,0)) +("000" & s_temp(0,1)) + ("000" & s_temp(0,2)) + ("000" & s_temp(1,0)) +("000" & s_temp(1,1)) + ("000" & s_temp(1,2))+ 
+          --  ("000" & s_temp(2,0))+("000" & s_temp(2,1)) +("000" & s_temp(2,2));
+          
+              s_tempOut(s_z) <= s_temp(0,0) +s_temp(0,1) + s_temp(0,2) + s_temp(1,0) + s_temp(1,1) + s_temp(1,2) + s_temp(2,0) + s_temp(2,1) + s_temp(2,2);
             
            -- s_tempOut(s_z) <= s_tempOut_11; 
            

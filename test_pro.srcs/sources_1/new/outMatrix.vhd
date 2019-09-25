@@ -40,6 +40,7 @@ entity outMatrix is
       rst: in STD_LOGIC := '0'; 
       readEnb: in STD_LOGIC;
       readData: in t_2d_out(0 to (matRow*matCol)-1); 
+      poolEnb : out STD_LOGIC := '0';
       matReady: out STD_LOGIC := '0'; 
       mat2Conv2: out t_2d_matrix(0 to matRow-1, 0 to matCol-1));
 end outMatrix;
@@ -59,6 +60,7 @@ if rising_edge(clk) then
     if rst ='1' then 
         s_matReady <= '0';
         d_matReady <= '0';
+        poolEnb <= '0';
         
     else
        if(readEnb ='1') then 
@@ -79,6 +81,7 @@ if rising_edge(clk) then
        end if;
    
        if s_matReady = '1' then
+            poolEnb <= '1';
             mat2Conv2 <= s_mat2Conv2;
             d_matReady <= s_matReady;
             

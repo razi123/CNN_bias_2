@@ -3,6 +3,8 @@ INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/khazi/Desktop/CNN_Bias_Relu-ma
 INFO: [VRFC 10-3107] analyzing entity 'BufferInput'
 INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/khazi/Desktop/CNN_Bias_Relu-master/CNN_Bias_Relu-master/test_pro.srcs/sources_1/new/Multiply.vhd" into library xil_defaultlib
 INFO: [VRFC 10-3107] analyzing entity 'Multiply'
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/khazi/Desktop/CNN_Bias_Relu-master/CNN_Bias_Relu-master/test_pro.srcs/sources_1/new/maxPool.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'maxPool'
 INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/khazi/Desktop/CNN_Bias_Relu-master/CNN_Bias_Relu-master/test_pro.srcs/sources_1/new/outMatrix.vhd" into library xil_defaultlib
 INFO: [VRFC 10-3107] analyzing entity 'outMatrix'
 INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/khazi/Desktop/CNN_Bias_Relu-master/CNN_Bias_Relu-master/test_pro.srcs/sources_1/new/rowCount.vhd" into library xil_defaultlib
