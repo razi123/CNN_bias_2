@@ -175,6 +175,7 @@ if rising_edge(clk) then
  end if;
 end if;
 end process;
+
 --s_ReLUreadData <= s_tempOut;
 
 --ReLU: process(clk,rst) is
@@ -205,10 +206,6 @@ end process;
 --doneMult <= d_doneMult;
 
        ---- convolveAdd Process ends here
-
-
-
-
 
 writeData <= s_temp;
 --doneMult <= s_doneMult;

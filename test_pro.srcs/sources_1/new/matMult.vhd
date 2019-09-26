@@ -69,78 +69,6 @@ signal s_poolData : t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
 signal s_outMatrix : t_2d_matrix(0 to matRow-1, 0 to matCol-1);
 
 -- ---------------------------------------------------------------------------------------------------------------------
---                                          COMPONENTS DECLERATION 
--- ---------------------------------------------------------------------------------------------------------------------
-component BufferInput
-    port(clk: in STD_LOGIC;
-         clkEnb : in STD_LOGIC := '0';
-         rst : in STD_LOGIC := '0';
-         inpMat : in t_2d_array(0 to matRow-1, 0 to matcol-1); 
-         readData : in t_2d_array(0 to matRow-1, 0 to matcol-1); 
-         writeEnb : out STD_LOGIC := '0';
-         cntEnb : out STD_LOGIC := '0';
-         cntRow : in integer range 0 to (((matRow-kernRow)/kernStride)+1)-1  := 0;
-         cntCol : in integer range 0 to (((matCol-kernRow)/kernStride)+1)-1  := 0;
-         writeData : out t_2d_kernal(0 to kernRow-1, 0 to kernCol-1);
-         doneBuff : in STD_LOGIC := '0');
-end component;
-
-component rowCount
-    port(clk: in STD_LOGIC;
-         cntEnb : in STD_LOGIC := '0';
-         rst : in STD_LOGIC := '0';
-         cntRow : out integer range 0 to (((matRow-kernRow)/kernStride)+1)-1  := 0;
-         cntCol : out integer range 0 to (((matCol-kernRow)/kernStride)+1)-1  := 0;
-       --  cntRow : out integer range 0 to (((matRow-kernRow)/(kernStride+1)-1  := 0;
-       --  cntCol : out integer range 0 to (((matCol-kernRow)/kernStride)+1)-1  := 0;
-         colDone : out STD_LOGIC := '0');
-    
-end component;
-
-component Multiply
-    port(clk: in STD_LOGIC;
-         clkEnb : in STD_LOGIC := '0';
-         rst : in STD_LOGIC := '0';
-         readEnb: in STD_LOGIC := '0';
-         readData : in t_2d_kernal(0 to kernRow-1, 0 to kernCol-1);
-         doneMult : out STD_LOGIC := '0';
-         writeData : out t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1);
-         outDataMultiply : out t_2d_out(0 to (matRow*matCol)-1));
-end component;
-
-component outMatrix
- port(clk : in STD_LOGIC;  
-      rst: in STD_LOGIC := '0'; 
-      readEnb: in STD_LOGIC;
-      readData: in t_2d_out(0 to (matRow*matCol)-1); 
-      poolEnb : out STD_LOGIC := '0';
-      matReady: out STD_LOGIC; 
-      mat2Conv2: out t_2d_matrix(0 to matRow-1, 0 to matCol-1));
-end component;
-
-
-
-component maxPool is
-     port(clk: in STD_LOGIC;
-         rst : in STD_LOGIC := '0';
-         poolRead : in t_2d_matrix(0 to matRow-1, 0 to matCol-1);
-         poolEnb : in STD_LOGIC := '0';
-         poolOut : out t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
-         donePool : out STD_LOGIC := '0');
-end component;
-
---component poolCount is
--- port(clk: in STD_LOGIC;
---      cntEnb : in STD_LOGIC :='0';
---      rst : in STD_LOGIC := '0';
---      poolRow : out integer range 0 to (((matRow-kernRow)/kernStride)+1)-1   := 0;
---      poolCol : out integer range 0 to (((matCol-kernCol)/kernStride)+1)-1   := 0;
---      poolDone : out STD_LOGIC := '0');
-      
---  end component;
-
-
--- ---------------------------------------------------------------------------------------------------------------------
 --                                         ARCHITECTURE BEGINS 
 -- ---------------------------------------------------------------------------------------------------------------------
 
@@ -150,7 +78,7 @@ begin
 --                                          COMPONENTS INSTANTIATION 
 -- ---------------------------------------------------------------------------------------------------------------------
 
-BUFFER_INPUT : BufferInput
+BUFFER_INPUT : entity work.BufferInput
 port map(clk => clk, 
         clkEnb => clkEnb, 
         rst => rst, 
@@ -164,7 +92,7 @@ port map(clk => clk,
         doneBuff => s_doneBit);
  
  
-ROW_COUNTER : rowCount 
+ROW_COUNTER : entity work.rowCount 
 port map(clk => clk,
               cntEnb => cntEnbSig, 
               rst => rst,
@@ -173,7 +101,7 @@ port map(clk => clk,
               colDone => s_colDone);       
         
 
-MULTILY : Multiply
+MULTILY : entity work.Multiply
     port map(clk => clk, 
          clkEnb => clkEnb, 
          rst => rst, 
@@ -184,7 +112,7 @@ MULTILY : Multiply
          outDataMultiply => s_outDataMultiply);
          
          
-OUT_MATRIX : outMatrix
+OUT_MATRIX : entity work.outMatrix
  port map(clk => clk, 
          rst => rst, 
          readEnb => s_doneOutBit,
@@ -195,21 +123,13 @@ OUT_MATRIX : outMatrix
          
 
  
-MAX_POOLING: maxPool
+MAX_POOLING: entity work.maxPool
      port map(clk => clk,  
               rst => rst,
               poolEnb => s_poolEnb,
               poolRead => s_outMatrix,
               poolOut => s_poolData,
               donePool => s_poolDone);  
-
-
---poolCount : port map (clk => clk,
---      cntEnb => cntEnb, 
---      rst => rst, 
---      poolRow => poolRow, 
---      poolCol => poolCol, 
---      poolDone => s_poolCntDone);
 
 --doneBit <= s_doneBit;         
 --outMat <= s_FIFO_Out;

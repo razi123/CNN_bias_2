@@ -28,6 +28,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --use IEEE.NUMERIC_STD.ALL;
 
+use std.textio.all;
+
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
@@ -39,6 +41,7 @@ use work.multPkg.all;
 entity mult_tb is
 --  Port ( );
 end mult_tb;
+
 
 architecture Behavioral of mult_tb is
 
@@ -68,6 +71,29 @@ signal s_inpMat : t_2d_array(0 to matRow-1, 0 to matcol-1);
 signal s_outMat : t_2d_out(0 to (matRow*matCol)-1);
 
 constant  clkPeriod : time := 20ns;
+
+
+--impure function RAMfunction(ramFilename : in string) return t_2d_array is
+--    FILE ramFile : text is in ramFilename;
+--    variable ramFileLine : line;
+--    variable RAM1 : t_2d_array;
+--    variable mTemp : bit_vector(3 downto 0);
+    
+--    begin 
+--    for I in t_2d_array'range loop
+        
+--        readline(ramFile,ramFileLine)
+        
+--        read(ramFileLine, mTemp);
+--        RAM1(I) := to_stdlogicvector(mTemp);
+--        end loop;
+--     end loop;
+--        return RAM1;
+-- end function;
+
+
+
+--signal imgRead : t_2d_array := RAMfunction("C:\\Users\\khazi\\Desktop\\CNN_Bias_Relu-master\\CNN_Bias_Relu-master\\test_pro.srcs\\sim_1\\new\\inp_data.txt");
 
 -- ---------------------------------------------------------------------------------------------------------------------
 --                                         ARCHITECTURE BEGINS 
@@ -112,7 +138,7 @@ if matRow =4 and matCol=4 then
     s_clkEnb <= '1';
 
     --s_inpMat <= (("0001","0010","0011","0100"),("0001","0010","0011","0100"),("0001","0010","0011","0100"),
-     --               ("0001","0010","0011","0100"));
+    --                ("0001","0010","0011","0100"));
     
     --s_inpMat <= (("1111","1111","1111","1111"),("1111","1111","1111","1111"),("1111","1111","1111","1111"),
     --           ("1111","1111","1111","1111"));
