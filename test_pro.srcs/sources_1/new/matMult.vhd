@@ -43,6 +43,7 @@ entity matMult is
            inpMat : in t_2d_array(0 to matRow-1, 0 to matcol-1); 
            rst : in STD_LOGIC:='0';
            outMat : out t_2d_out(0 to (matRow*matCol)-1);
+           readNext : out STD_LOGIC;
            doneBit : out STD_LOGIC:='0');
 end matMult;
 
@@ -64,10 +65,12 @@ signal cntCol : integer range 0 to (((matRow-kernRow)/kernStride)+1)-1 ;
 
 signal s_tempMult: t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1) := (("00000000","00000000","00000000"),("00000000","00000000","00000000"),("00000000","00000000","00000000")); 
 signal s_outDataMultiply, s_ReLU_Out, s_FIFO_Out, s_outDataFIFO: t_2d_out(0 to (matRow*matCol)-1);
-signal s_colDone, s_doneBit, s_poolDone, s_doneOutBit, s_enbConv2, s_poolCntDone, s_poolEnb: STD_LOGIC := '0';
+signal s_colDone, s_doneBit, s_poolDone, s_enbConv2, s_poolCntDone, s_poolEnb: STD_LOGIC := '0';
+signal s_doneOutBit : STD_LOGIC_VECTOR(1 downto 0) := "00";
 signal s_poolData : t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
 signal s_outMatrix : t_2d_matrix(0 to matRow-1, 0 to matCol-1);
-
+--signal s_outMatrix : t_2d_matrixInt(0 to matRow-1, 0 to matCol-1);
+signal s_normSum : STD_LOGIC_VECTOR(7 downto 0);
 -- ---------------------------------------------------------------------------------------------------------------------
 --                                         ARCHITECTURE BEGINS 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -109,16 +112,18 @@ MULTILY : entity work.Multiply
          readData => outData, 
          doneMult => s_doneOutBit, 
          writeData => s_tempMult,
+         normSum => s_normSum,
          outDataMultiply => s_outDataMultiply);
          
          
 OUT_MATRIX : entity work.outMatrix
  port map(clk => clk, 
          rst => rst, 
-         readEnb => s_doneOutBit,
+         readEnb => s_doneOutBit(0),
          poolEnb => s_poolEnb,
          readData => s_outDataMultiply, 
          matReady => s_enbConv2, 
+         normSum => s_normSum,
          mat2Conv2 => s_outMatrix);
          
 
@@ -139,5 +144,5 @@ MAX_POOLING: entity work.maxPool
 --outMat <= s_outDataMultiply;
      
 doneBit <= s_enbConv2;     
-
+readNext <= s_doneOutBit(1);
 end Behavioral;

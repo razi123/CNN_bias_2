@@ -43,8 +43,9 @@ entity Multiply is
          rst : in STD_LOGIC := '0';
          readEnb: in STD_LOGIC := '0';
          readData : in t_2d_kernal(0 to kernRow-1, 0 to kernCol-1);
-         doneMult : out STD_LOGIC := '0';
+         doneMult : out STD_LOGIC_VECTOR(1 downto 0);
          writeData : out t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1);
+         normSum : out STD_LOGIC_VECTOR(7 downto 0);
          outDataMultiply : out t_2d_out(0 to (matRow*matCol)-1));
 end Multiply;
 
@@ -60,15 +61,15 @@ signal s_temp: t_tempKernal2d(0 to kernRow-1, 0 to kernCol-1) ;
 signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("0001","0000","0000"),("0000","0001","0000"),("0000","0000","0001"));
 --signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("1111","1111","1111"),("1111","1111","1111"),("1111","1111","1111"));
 signal s_doneMultiply : STD_LOGIC :='0';
-signal s_z : integer ;
-signal s_tempOut : t_2d_out(0 to (matRow*matCol)-1);
-signal s_tempOut_11 :  STD_LOGIC_VECTOR(10 downto 0);
+signal s_z : integer;
+signal s_tempOut : t_2d_out(0 to (matRow*matCol)-1):= (others=>(others=> '0'));
 
 signal s_readEnb_d : std_logic;
-signal s_doneMult : STD_LOGIC := '0';
+signal s_doneMult: STD_LOGIC_VECTOR(1 downto 0) := "00";
 signal s_ReLU: STD_LOGIC := '0';
 signal s_outDataMultiply, s_ReLU_Out, s_ReLUreadData: t_2d_out(0 to (matRow*matCol)-1);
 signal s_bias : STD_LOGIC_VECTOR(7 downto 0):= "00000001";
+signal s_normSum : STD_LOGIC_VECTOR(7 downto 0):= "00000000";
 
 signal s_tempSignal : STD_LOGIC_VECTOR(7 downto 0);
 signal m : integer range 0 to matRow-1 :=0;
@@ -116,7 +117,9 @@ begin
 if rising_edge(clk) then 
     if rst='1' then 
        s_doneMultiply <= '0';
-       s_readEnb_d<='0';
+       s_readEnb_d <= '0';
+     
+       
     else
         s_doneMultiply <= '0';
         if(readEnb = '1') then
@@ -140,37 +143,42 @@ end process;  ---- convolve Process ends here
 convolveAdd : process(clk,rst) is
 --variable m : integer range 0 to matRow-1 :=0;
 --variable n : integer range 0 to matCol-1 :=0;
-
+variable v_normSum : STD_LOGIC_VECTOR(7 downto 0) := "00000000";
+--variable s_doneMult: STD_LOGIC_VECTOR(1 downto 0) := "00";
 begin
 if rising_edge(clk) then     
     if rst='1' then 
-        s_doneMult <= '0';
-        doneMult <= '0';
+        s_doneMult <= "00";
+        doneMult <= "00";
         s_z<=0;
         m <= 0;
         n <= 0;
+        --v_normSum := "00000000";
+        s_normSum <= "00000000";
     else
         if(s_readEnb_d = '1') then
           --  s_tempOut(s_z) <= ("000" & s_temp(0,0)) +("000" & s_temp(0,1)) + ("000" & s_temp(0,2)) + ("000" & s_temp(1,0)) +("000" & s_temp(1,1)) + ("000" & s_temp(1,2))+ 
           --  ("000" & s_temp(2,0))+("000" & s_temp(2,1)) +("000" & s_temp(2,2));
           
               s_tempOut(s_z) <= s_temp(0,0) +s_temp(0,1) + s_temp(0,2) + s_temp(1,0) + s_temp(1,1) + s_temp(1,2) + s_temp(2,0) + s_temp(2,1) + s_temp(2,2);
-            
-           -- s_tempOut(s_z) <= s_tempOut_11; 
+              --v_normSum := v_normSum + s_temp(0,0) +s_temp(0,1) + s_temp(0,2) + s_temp(1,0) + s_temp(1,1) + s_temp(1,2) + s_temp(2,0) + s_temp(2,1) + s_temp(2,2);
+              --s_normSum <= v_normSum;
            
             if(s_z < (matRow*matCol)-1) then
                 s_z <= s_z + 1;
-                s_doneMult <= '0';
+                s_doneMult <= "00";
             else 
                 s_z <= 0;
-                s_doneMult <= '1';                
+               s_doneMult <= "11";                
 
             end if;  
         end if;        
      
-        if s_doneMult='1' then
+        if s_doneMult = "11" then
+           --v_normSum := "00000000";
           outDataMultiply <= s_tempOut;
           doneMult <= s_doneMult;
+          
         end if;  
  end if;
 end if;
@@ -209,5 +217,6 @@ end process;
 
 writeData <= s_temp;
 --doneMult <= s_doneMult;
+normSum <= s_normSum;
 
 end Behavioral;

@@ -72,7 +72,7 @@ signal  d_writeEnb_d : STD_LOGIC;
 begin
    
 zeroPad: process(clk,rst) 
-
+--variable s_zeroMat : STD_LOGIC := '0';
 begin 
 
 if rising_edge(clk)then
@@ -106,19 +106,19 @@ else
     
 end if;
 end if; 
-
 end process;  ---- zeroPad Process ends here
 
 
 fetchMatrix_3x3 : process(clk,rst) is 
+--variable s_writeEnb : STD_LOGIC :='0';
 begin   
   if rising_edge(clk)  then
     if rst ='1' then
-        s_writeEnb<='0';
+        s_writeEnb <='0';
         cntEnb<='0';
     else
         cntEnb<='0';
-        s_writeEnb<='0';
+        s_writeEnb <='0';
         if s_fetchEnb = '1' then
     
 --        if cntCol > 0 then
@@ -136,7 +136,7 @@ begin
          end if;
     end if;
   
-    d_writeEnb_d<=s_writeEnb;
+    d_writeEnb_d <= s_writeEnb;
     
    end if;
    

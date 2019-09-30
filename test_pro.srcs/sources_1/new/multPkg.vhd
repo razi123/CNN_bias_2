@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 package multPkg is 
 
 constant matRow :  integer := 5; 
-constant matCol :  integer := 5;
+constant matCol :  integer := 7;
 constant kernRow : integer := 3;
 constant kernCol : integer := 3;
 constant kernStride : integer := 1;
@@ -46,8 +46,12 @@ type t_tempKernal2d is array(integer range <>, integer range <>) of STD_LOGIC_VE
 type t_2d_out is array(integer range <>) of STD_LOGIC_VECTOR(7 downto 0);
 type t_2d_out11 is array(integer range <>) of STD_LOGIC_VECTOR(7 downto 0);
 
+
+--type t_2d_matrixInt is array(integer range <>, integer range<>) of integer; 
 type t_2d_matrix is array(integer range <>, integer range<>) of STD_LOGIC_VECTOR(7 downto 0);
+type t_2d_matPool is array(integer range <>, integer range<>) of STD_LOGIC_VECTOR(3 downto 0);
 type t_2d_matrix16 is array(integer range <>, integer range <>) of STD_LOGIC_VECTOR(11 downto 0);
+
 
 
 

@@ -56,6 +56,7 @@ component matMult
            rst: in STD_LOGIC;
            inpMat : in t_2d_array(0 to matRow-1, 0 to matcol-1); 
            outMat : out t_2d_out(0 to (matRow*matCol)-1);
+           readNext : out STD_LOGIC;
            doneBit : out STD_LOGIC:='0');
 end component;
 
@@ -67,6 +68,7 @@ signal s_clk : STD_LOGIC := '0';
 signal s_done : STD_LOGIC;
 signal s_rst : STD_LOGIC;
 signal s_clkEnb : STD_LOGIC;
+signal s_readNext : STD_LOGIC;
 signal s_inpMat : t_2d_array(0 to matRow-1, 0 to matcol-1);
 signal s_outMat : t_2d_out(0 to (matRow*matCol)-1);
 
@@ -110,6 +112,7 @@ uut : matMult
                 inpMat => s_inpMat,
                 clkEnb => s_clkEnb, 
                 rst=> s_rst, 
+                readNext => s_readNext,
                 outMat=>s_outMat, 
                 doneBit => s_done); 
 
@@ -137,16 +140,17 @@ if matRow =4 and matCol=4 then
     s_rst <= '0';
     s_clkEnb <= '1';
 
-    --s_inpMat <= (("0001","0010","0011","0100"),("0001","0010","0011","0100"),("0001","0010","0011","0100"),
-    --                ("0001","0010","0011","0100"));
+    s_inpMat <= (("0001","0010","0011","0100"),("0001","0010","0011","0100"),("0001","0010","0011","0100"),
+                    ("0001","0010","0011","0100"));
     
     --s_inpMat <= (("1111","1111","1111","1111"),("1111","1111","1111","1111"),("1111","1111","1111","1111"),
     --           ("1111","1111","1111","1111"));
      
-     s_inpMat <= (("0001","1010","0011","0101"),("1001","0110","0011","1110"),("0101","0111","1000","0100"),
-                    ("1011","1100","0000","0100"));
+     --s_inpMat <= (("0001","1010","0011","0101"),("1001","0110","0011","1110"),("0101","0111","1000","0100"),
+      --              ("1011","1100","0000","0100"));
                  
     wait until s_done='1'; 
+    --wait until s_readNext='1';
     
     s_rst <= '1';
     s_clkEnb <= '0';
@@ -162,7 +166,7 @@ if matRow =4 and matCol=4 then
                  ("0001","0011","0011","0100"));    
                  
     wait until s_done='1';           
-    
+    --wait until s_readNext='1';
 -- ---------------------------------------------------------------------------------------------------------------------
 --                                         TEST CASE for 5x5
 -- ---------------------------------------------------------------------------------------------------------------------
