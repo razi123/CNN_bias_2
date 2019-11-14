@@ -53,14 +53,13 @@ architecture Behavioral of outMatrix is
 signal s_readData : t_2d_out(0 to (matRow*matCol)-1);
 signal s_mat2Conv2 : t_2d_matrix(0 to matRow-1, 0 to matCol-1);
 --signal s_mat2Conv2 : t_2d_matrixInt(0 to matRow-1, 0 to matCol-1);
-signal s_matReady, d_matReady,d1_matReady : STD_LOGIC:= '0'; 
+signal s_matReady, d_matReady : STD_LOGIC:= '0'; 
 
 signal s_tempNorm :  STD_LOGIC_VECTOR(7 downto 0) :="00000000";
 begin
 
 process(clk,rst)
 variable k : integer range 0 to (matRow*matCol)-1 ;
-variable tempNorm : STD_LOGIC_VECTOR(7 downto 0) :="00000000";
 begin
 
 if rising_edge(clk) then
@@ -68,8 +67,7 @@ if rising_edge(clk) then
         s_matReady <= '0';
         d_matReady <= '0';
         poolEnb <= '0';
-        
-        
+            
     else
        if(readEnb ='1') then 
             s_readData <= readData;
@@ -77,7 +75,7 @@ if rising_edge(clk) then
                 for j in 0 to matCol-1 loop
                     --s_mat2Conv2(i,j) <= to_integer(unsigned(s_readData(k)));
                     s_mat2Conv2(i,j) <= s_readData(k);
-                    tempNorm := tempNorm + s_mat2Conv2(i,j);
+                    
                     if(k>(matRow*matCol)-2) then
                         k:= 0;
                         --s_matReady <= '1';
@@ -93,14 +91,12 @@ if rising_edge(clk) then
        if s_matReady = '1' then
             poolEnb <= '1';
             mat2Conv2 <= s_mat2Conv2;
-            d_matReady <= s_matReady;
-            
+            d_matReady <= s_matReady;            
        end if; 
 
     end if; 
 end if;
 
-s_tempNorm  <= tempNorm;
 end process;
 
 matReady <= d_matReady;

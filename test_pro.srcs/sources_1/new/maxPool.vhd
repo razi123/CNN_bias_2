@@ -43,21 +43,25 @@ entity maxPool is
          poolEnb : in STD_LOGIC := '0';
          poolRead : in t_2d_matrix(0 to matRow-1, 0 to matCol-1);
          --poolRead : in t_2d_matrixInt(0 to matRow-1, 0 to matCol-1);
-         poolOut : out t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
+         --poolOut : out t_2d_out(0 to ((matRow - kernRow)*(matCol - matCol)) -1);
+         poolOut : out t_2d_matPool(0 to ((matRow-kernRow)/kernStride), 0 to ((matCol-kernCol)/kernStride)); 
+         nxtEnb : out STD_LOGIC := '0';
          donePool : out STD_LOGIC := '0');
 end maxPool;
 
 architecture Behavioral of maxPool is
+
 --signal s_tempPoolRegister : t_2d_matrixInt(0 to matRow-1, 0 to matCol-1);
 signal s_tempPoolRegister : t_2d_matrix(0 to matRow-1, 0 to matCol-1); -- := (("00000001","00000001","00000001","00000001"),("00000001","00000001","00000001","00000001"), 
                                   -- ("00000001","00000001","00000001","00000001"),("00000001","00000001","00000001","00000001"));
 signal s_temp1 : t_2d_matrix16(0 to kernRow-1, 0 to kernCol-1);
 signal s_filtKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1) := (("0001","0001","0001"),("0001","0001","0001"),("0001","0001","0001"));
-signal s_fetchDone : STD_LOGIC := '0';
+signal s_fetchDone, s_nxtEnb : STD_LOGIC := '0';
 --signal s_maxPoolOut :  t_2d_matrix16(0 to ((matRow-kernRow)/kernStride), 0 to ((matCol-kernCol)/kernStride));
 signal s_maxPoolOut :  t_2d_matPool(0 to ((matRow-kernRow)/kernStride), 0 to ((matCol-kernCol)/kernStride));   
 
 signal s_n : integer;  --range 0 to 3 :=0;
+signal s_cnt : integer :=0;  --range 0 to 3 :=0;
 signal s_m : integer; -- range 0 to 3 :=0;
 signal i,j :integer range 0 to 2;
 
@@ -67,11 +71,13 @@ s_tempPoolRegister <= poolRead;
 
 process(clk)
 
-variable v_temp : t_2d_matrix16(0 to kernRow-1, 0 to kernCol-1);
+--variable v_temp : t_2d_matrix16(0 to kernRow-1, 0 to kernCol-1);
+variable v_temp : t_2d_matrix(0 to kernRow-1, 0 to kernCol-1);
 variable v_tempInt : integer := 0;
-variable  v_poolMax : STD_LOGIC_VECTOR(11 downto 0) := "000000000000"; 
+--variable  v_poolMax : STD_LOGIC_VECTOR(11 downto 0) := "000000000000"; 
+variable  v_poolMax : STD_LOGIC_VECTOR(7 downto 0) := (others=>'0'); 
 variable v_i,v_j :integer range 0 to 2;
-variable m, n : integer := 0;
+variable m, n, v_cnt: integer := 0;
 
 begin
 
@@ -79,30 +85,45 @@ if rising_edge(clk) then
     if rst = '1' then
         donePool <= '0';
         s_fetchDone <= '0';
-        v_poolMax := "000000000000";
+        v_poolMax := "00000000";
         m:= 0;
         n:= 0;
+        s_cnt <= 0;
+        s_nxtEnb <='0';
         
 else
-            v_poolMax := "000000000000";
+            v_poolMax := "00000000";
             
-            v_temp(0,0) := s_tempPoolRegister(0+s_m,1+s_n) * s_filtKernal(0,0);   
-            v_temp(0,1) := s_tempPoolRegister(0+s_m,1+s_n) * s_filtKernal(0,1);
-            v_temp(0,2) := s_tempPoolRegister(0+s_m,2+s_n) * s_filtKernal(0,2);
+            v_temp(0,0) := s_tempPoolRegister(0+s_m,1+s_n);    
+            v_temp(0,1) := s_tempPoolRegister(0+s_m,1+s_n); 
+            v_temp(0,2) := s_tempPoolRegister(0+s_m,2+s_n); 
             
-            v_temp(1,0) := s_tempPoolRegister(1+s_m,0+s_n) * s_filtKernal(1,0);
-            v_temp(1,1) := s_tempPoolRegister(1+s_m,1+s_n) * s_filtKernal(1,1);
-            v_temp(1,2) := s_tempPoolRegister(1+s_m,2+s_n) * s_filtKernal(1,2);
+            v_temp(1,0) := s_tempPoolRegister(1+s_m,0+s_n); 
+            v_temp(1,1) := s_tempPoolRegister(1+s_m,1+s_n); 
+            v_temp(1,2) := s_tempPoolRegister(1+s_m,2+s_n); 
             
-            v_temp(2,0) := s_tempPoolRegister(2+s_m,0+s_n) * s_filtKernal(2,0);
-            v_temp(2,1) := s_tempPoolRegister(2+s_m,1+s_n) * s_filtKernal(2,1);
-            v_temp(2,2) := s_tempPoolRegister(2+s_m,2+s_n) * s_filtKernal(2,2);
+            v_temp(2,0) := s_tempPoolRegister(2+s_m,0+s_n); 
+            v_temp(2,1) := s_tempPoolRegister(2+s_m,1+s_n); 
+            v_temp(2,2) := s_tempPoolRegister(2+s_m,2+s_n); 
             
             
               for i in 0 to 2 loop
                 for j in 0 to 2 loop
                     if(v_poolMax < v_temp(i,j)) then
                         v_poolMax := v_temp(i,j);
+                        
+                        if(s_cnt = matRow) then
+                            s_cnt <= s_cnt + 1;
+                            s_nxtEnb <= '1';
+                        elsif(s_cnt = (matRow-2)*(matCol-2) + 11) then
+                            s_cnt <= 0;
+                            s_nxtEnb <= '0';
+                        
+                        else 
+                            s_cnt <= s_cnt + 1;
+                            s_nxtEnb <= s_nxtEnb;
+                              
+                        end if;
                      end if;
                  end loop;
               end loop; 
@@ -111,8 +132,13 @@ else
               if(m <= ((matRow - kernRow)/kernStride)) then
                 if(n <= ((matCol - kernCol)/kernStride)) then
                     
-                    v_tempInt := to_integer(unsigned(v_poolMax)); 
-                    s_maxPoolOut(m,n) <= std_logic_vector(to_unsigned(v_tempInt,4)); 
+                    --v_tempInt := to_integer(unsigned(v_poolMax)); 
+                    --s_maxPoolOut(m,n) <= std_logic_vector(to_unsigned(v_tempInt,4));
+                     
+                  --  s_maxPoolOut(m,n) <= v_poolMax(3 downto 0);
+                    
+                    --s_maxPoolOut(m,n) <= v_poolMax;
+                   poolOut(m,n)  <= v_poolMax; 
                     n := n+ kernStride;
                     if(n = ((matCol - kernCol)/kernStride)+1) then
                        m := m + kernStride;
@@ -125,6 +151,8 @@ else
              
 end if;
 
+nxtEnb <= s_nxtEnb;
+--s_cnt <= v_cnt;
 --s_temp1 <= s_temp;
 --s_tempMax1 <= s_tempMax;
 end process;    

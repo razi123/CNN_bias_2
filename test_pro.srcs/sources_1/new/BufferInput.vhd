@@ -62,7 +62,7 @@ signal s_zeroMat : STD_LOGIC := '0';
 signal s_matKernal : t_2d_kernal(0 to kernRow-1, 0 to kernCol-1);
 signal s_fetchEnb: STD_LOGIC := '0';
 signal s_writeEnb : STD_LOGIC :='0'; 
-signal  d_writeEnb_d : STD_LOGIC;
+signal d_writeEnb_d : STD_LOGIC;
 
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -77,11 +77,11 @@ begin
 
 if rising_edge(clk)then
 if rst ='1' then
-s_zeroMat <= '0';
-s_fetchEnb <= '0';
+    s_zeroMat <= '0';
+    s_fetchEnb <= '0';
 
 else
-  s_fetchEnb <= '0';
+    s_fetchEnb <= '0';
   
     if clkEnb ='1' and s_zeroMat = '0' then
               
@@ -94,8 +94,8 @@ else
   
     s_zeroMat <= '1';
 
-   else
-  s_fetchEnb <= '1';   
+    else
+        s_fetchEnb <= '1';   
          for i in 0 to matRow-1 loop
             for j in 0 to matCol-1 loop
                 s_padInp(i,j) <= inpMat(i,j);
@@ -112,9 +112,9 @@ end process;  ---- zeroPad Process ends here
 fetchMatrix_3x3 : process(clk,rst) is 
 --variable s_writeEnb : STD_LOGIC :='0';
 begin   
-  if rising_edge(clk)  then
+if rising_edge(clk)  then
     if rst ='1' then
-        s_writeEnb <='0';
+        s_writeEnb <= '0';
         cntEnb<='0';
     else
         cntEnb<='0';
@@ -144,6 +144,7 @@ end process;  ---- fetchMatrix_3x3 Process ends here
 
 
 writeEnb <= d_writeEnb_d;
+--writeEnb <= s_writeEnb;
 writeData <= s_matKernal;
 
 end Behavioral;

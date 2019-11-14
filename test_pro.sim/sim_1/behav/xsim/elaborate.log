@@ -19,6 +19,10 @@ Compiling architecture behavioral of entity xil_defaultlib.rowCount [rowcount_de
 Compiling architecture behavioral of entity xil_defaultlib.Multiply [multiply_default]
 Compiling architecture behavioral of entity xil_defaultlib.outMatrix [outmatrix_default]
 Compiling architecture behavioral of entity xil_defaultlib.maxPool [maxpool_default]
+Compiling architecture behavioral of entity xil_defaultlib.Buffer_Conv2 [buffer_conv2_default]
+Compiling architecture behavioral of entity xil_defaultlib.rowCount2 [rowcount2_default]
+Compiling architecture behavioral of entity xil_defaultlib.Multiply2 [multiply2_default]
+Compiling architecture behavioral of entity xil_defaultlib.outMatrix2 [outmatrix2_default]
 Compiling architecture behavioral of entity xil_defaultlib.matMult [matmult_default]
 Compiling architecture behavioral of entity xil_defaultlib.mult_tb
 Built simulation snapshot mult_tb_behav
